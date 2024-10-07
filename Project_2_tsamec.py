@@ -1,34 +1,42 @@
 ########################################
 # Projekt 2  ke kurzu Testing Akademie #
 # Jméno: Bc.Tomáš Samec                #
-# Discord: testing-21-3-2024           #
-# jméno na Discordu: Tomáš S.          #
 ########################################
+
+from playwright._impl._errors import TimeoutError as PlaywrightTimeoutError
+
+def potvrzeni_cookies(page):
+    """
+    *  Funkce 5 vteřin testuje zda se načetlo potvrzovací okno cookies.
+    Důvodem tohoto opatření je ošetření varianty spuštění kódu v headless módu,
+        při kterém načtení potvrzovacího okna cookies neproběhne a kód skončí chybovou hláškou TimeoutError.
+    :param page: Objekt, který představuje jednu webovou stránku otevřenou v prohlížeči
+    :return: Funkce vypíše buď potvrzení cookies nebo, že se potvrzovací okno nezobrazilo
+    """
+
+    try:
+        page.locator("span:has-text('Rozumím a přijímám')").wait_for(state='visible', timeout=5000)
+        cookies_button = page.locator("span:has-text('Rozumím a přijímám')")
+        cookies_button.click()
+        print("\tBylo kliknuto na tlačítko 'Rozumím a přijímám'.")
+    except PlaywrightTimeoutError:
+        print("\tSouhlas s cookies se nezobrazil do 5 sekund, proto kód pokračoval dál.")
+    return
+
 
 
 def test_root_telefon_na_vydavatele(page):
     """
     *   Funkce testuje na webové stránce https://www.root.cz/ správnost telefonního čísla na sídlo vydavatele.
     Tvar hledaného telefonního čísla: +420 778 885 502
-      *   Kód navíc obsahuje řádky pro otestování zda se načetlo potvrzovací okno cookies.
-    Důvodem tohoto opatření je ošetření varianty spuštění kódu v headless módu,
-        při kterém načtení potvrzovacího okna cookies neproběhne a kód skončí chybovou hláškou timeout error.
     :param page: Objekt, který představuje jednu webovou stránku otevřenou v prohlížeči
     :return: Porovnání očekávaného a skutečného telefonního čísla
     """
 
+
     # Načtení stránky, potvrzení cookies a proklikání na stránku s kontakty
     page.goto('https://www.root.cz/')
-
-    #_# Čekání 5 vteřin na načtení potvrzení souhlasu s cookies, jinak kód pokračuje dál
-    try:
-        page.locator("span:has-text('Rozumím a přijímám')").wait_for(state='visible', timeout=5000)
-        cookies_button = page.locator("span:has-text('Rozumím a přijímám')")
-        cookies_button.click()
-        print("\tBylo kliknuto na tlačítko 'Rozumím a přijímám'.")
-    except:
-        print("\tSouhlas s cookies se nezobrazil do 5 sekund, proto kód pokračoval dál.")
-
+    potvrzeni_cookies(page)
     contact_link = page.locator("a[href='https://www.root.cz/kontakt/']")
     contact_link.click()
 
@@ -52,26 +60,15 @@ def test_root_vyhledani_knihy_Ucebnice_jazyka_Python(page):
     """
     *   Funkce testuje na webové stránce https://www.root.cz/ vyhledávání knižního titulu,
     který je na webu Root.cz dostupný ve formátu pdf.
-    *   Kód navíc obsahuje řádky pro otestování zda se načetlo potvrzovací okno cookies.
-    Důvodem tohoto opatření je ošetření varianty spuštění kódu v headless módu,
-        při kterém načtení potvrzovacího okna cookies neproběhne a kód skončí chybovou hláškou timeout error.
     :param page: Objekt, který představuje jednu webovou stránku otevřenou v prohlížeči
     :return: Počet názvů knihy nalezených na stránce. Žádný název = vyhledávání na webu nefunguje
     :výsledek testu: Webová stránka testem neprošla. Ačkoliv se tam kniha nachází, nebyla vyhledavačem nalezená.
     """
 
+
     # Načtení stránky, potvrzení cookies a aktivace vyhledávacího pole
     page.goto('https://www.root.cz/')
-
-    #_# Čekání 5 vteřin na načtení potvrzení souhlasu s cookies, jinak kód pokračuje dál
-    try:
-        page.locator("span:has-text('Rozumím a přijímám')").wait_for(state='visible', timeout=5000)
-        cookies_button = page.locator("span:has-text('Rozumím a přijímám')")
-        cookies_button.click()
-        print("\tBylo kliknuto na tlačítko 'Rozumím a přijímám'.")
-    except:
-        print("\tSouhlas s cookies se nezobrazil do 5 sekund, proto kód pokračoval dál.")
-
+    potvrzeni_cookies(page)
     search_link = page.locator("a.navigation__link--search.navigation__link:has(span.element-blind-user:has-text('Hledat'))")
     search_link.click()
     search_field = page.locator("#search-field-query")
@@ -93,25 +90,14 @@ def test_root_pokus_o_prihlaseni(page):
     """
     *   Funkce testuje na webové stránce https://www.root.cz/ správnost chybové hlášky
     při pokusu o přihlášení s nesprávnými údaji.
-    *   Kód navíc obsahuje řádky pro otestování zda se načetlo potvrzovací okno cookies.
-    Důvodem tohoto opatření je ošetření varianty spuštění kódu v headless módu,
-        při kterém načtení potvrzovacího okna cookies neproběhne a kód skončí chybovou hláškou timeout error.
     :param page: Objekt, který představuje jednu webovou stránku otevřenou v prohlížeči
     :return: Porovnání očekávaného a skutečného textu chybové hlášky
     """
 
+
     # Načtení stránky, potvrzení cookies a proklikání na přihlašovací stránku.
     page.goto('https://www.root.cz/')
-
-    #_# Čekání 5 vteřin na načtení potvrzení souhlasu s cookies, jinak kód pokračuje dál
-    try:
-        page.locator("span:has-text('Rozumím a přijímám')").wait_for(state='visible', timeout=5000)
-        cookies_button = page.locator("span:has-text('Rozumím a přijímám')")
-        cookies_button.click()
-        print("\tBylo kliknuto na tlačítko 'Rozumím a přijímám'.")
-    except:
-        print("\tSouhlas s cookies se nezobrazil do 5 sekund, proto kód pokračoval dál.")
-
+    potvrzeni_cookies(page)
     login_link = page.locator("span.icon--profile.icon.design-svg-element")
     login_link.click()
 
